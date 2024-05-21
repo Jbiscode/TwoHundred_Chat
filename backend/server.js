@@ -1,7 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
+
 import authRoutes from './routes/auth.routers.js';
 import messageRoutes from './routes/message.routers.js';
+import userRoutes from './routes/user.routers.js';
+
 import connectToMongoDB  from './db/connectToMongoDB.js';
 import cookieParser from 'cookie-parser'; // 쿠키 파서 미들웨어가 있어야 쿠키를 불러 올 수 있다.
 
@@ -15,6 +18,7 @@ app.use(cookieParser()); // 쿠키파서 미들웨어 추가
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/users", userRoutes);
 
 
 
