@@ -5,8 +5,8 @@ export const sendMessage = async (req, res) => {
   console.log("sendMessage");
   try {
     const { message } = req.body;
-    const { id: receiverId } = req.params;
-    const senderId = req.user._id;
+    const { id: receiverId } = req.params; // 보낼때 receiverId는 상대방의 아이디
+    const senderId = req.user._id; // 보낼때 senderId는 나의 아이디
 
     let conversation = await Conversation.findOne({
       participants: { $all: [senderId, receiverId] }, // senderId와 receiverId를 모두 포함하는 conversation을 찾음 $all은 mongoDB에서 모두 포함하는 것을 찾을 때 사용
@@ -45,4 +45,27 @@ export const sendMessage = async (req, res) => {
 
 export const getMessages = async (req, res) => {
   console.log("getMessages");
+  try {
+    const { id: receiverId } = req.params; // 받을때 receiverId는 나의 아이디
+    const senderId = req.user._id; // 받을때 senderId는 상대방의 아이디
+
+    const conversation = await Conversation.findOne({
+      participants: { $all: [senderId, receiverId] },
+    }).populate("messages"); // conversation을 찾고 그 conversation에 있는 저장된 messages를 가져옴
+
+
+    if (!conversation) {
+      return res.status(200).json({ message: "메시지가 없습니다." });
+    }
+    
+    res.status(200).json(conversation.messages);
+
+    // const messages = await Message.find({
+    //   _id: { $in: conversation.messages },
+    // });
+
+    // res.status(200).json(messages);
+  } catch (error) {
+    res.status(500).json({ message: "메시지 불러오기 중 오류가 발생했습니다." });
+  }
 };
