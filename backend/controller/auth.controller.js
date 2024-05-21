@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import generateJWTAndSetCookie from "../utils/generateJWT.js";
 
 export const signup = async (req, res) => {
   try {
@@ -22,18 +23,26 @@ export const signup = async (req, res) => {
     const newUser = new User({
       fullName,
       username,
-      password:hashedPassword,
+      password: hashedPassword,
       gender,
       profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
     });
-    await newUser.save();
-
-    res.status(201).json({
-      _id: newUser._id,
-      fullName: newUser.fullName,
-      username: newUser.username,
-      profilePic: newUser.profilePic,
-    });
+    if (newUser) {
+      generateJWTAndSetCookie(newUser._id, res);
+      try {
+        await newUser.save();
+      } catch (error) {
+        return res.status(500).json({ message: "사용자 저장 중 오류가 발생했습니다." });
+      }
+      res.status(201).json({
+        _id: newUser._id,
+        fullName: newUser.fullName,
+        username: newUser.username,
+        profilePic: newUser.profilePic,
+      });
+    } else {
+      res.status(400).json({ message: "회원가입에 실패했습니다." });
+    }
   } catch (error) {
     res.status(500).json({ message: "응답에 실패했습니다." });
   }
@@ -46,3 +55,4 @@ export const login = (req, res) => {
 export const logout = (req, res) => {
   res.send("auth logout route");
 };
+
