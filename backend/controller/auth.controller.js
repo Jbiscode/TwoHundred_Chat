@@ -32,7 +32,9 @@ export const signup = async (req, res) => {
       try {
         await newUser.save();
       } catch (error) {
-        return res.status(500).json({ message: "사용자 저장 중 오류가 발생했습니다." });
+        return res
+          .status(500)
+          .json({ message: "사용자 저장 중 오류가 발생했습니다." });
       }
       res.status(201).json({
         _id: newUser._id,
@@ -48,11 +50,40 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = (req, res) => {
-  res.send("auth login route");
+export const login = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user?.password || ""
+    );
+
+    if (!user || !isPasswordCorrect) {
+      return res
+        .status(400)
+        .json({ message: "아이디 또는 비밀번호가 일치하지 않습니다." });
+    }
+
+    generateJWTAndSetCookie(user._id, res);
+
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      username: user.username,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "로그인 중 오류가 발생했습니다." });
+  }
 };
 
 export const logout = (req, res) => {
-  res.send("auth logout route");
+try {
+  res.clearCookie("jwt");
+  res.status(200).json({ message: "로그아웃 되었습니다." });
+} catch (error) {
+  console.log("Error in logout: ", error);
+  res.status(500).json({ message: "로그아웃 중 오류가 발생했습니다." });
+}
 };
-
