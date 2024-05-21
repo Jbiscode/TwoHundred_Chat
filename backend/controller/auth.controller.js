@@ -1,11 +1,13 @@
 export const signup = (req, res) => {
-  res.send('auth register route');
-}
+  try {
+    const { fullName, username, password, confirmPassword, gender } = req.body;
+  } catch (error) {}
+};
 
 export const login = (req, res) => {
-  res.send('auth login route');
-}
+  res.send("auth login route");
+};
 
 export const logout = (req, res) => {
-  res.send('auth logout route');
-}
+  res.send("auth logout route");
+};
