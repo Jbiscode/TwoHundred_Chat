@@ -8,7 +8,7 @@ const Conversations = () => {
   return (
     <div className="py-2 flex flex-col overflow-auto">
       {loading ? (
-        <span className="loading loading-lg"></span>
+        <span className="loading loading-spinner"></span>
       ) : (
         conversations.map((conversation) => (
           <Conversation
