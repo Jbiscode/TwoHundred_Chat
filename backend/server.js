@@ -7,8 +7,9 @@ import userRoutes from './routes/user.routers.js';
 
 import connectToMongoDB  from './db/connectToMongoDB.js';
 import cookieParser from 'cookie-parser'; // 쿠키 파서 미들웨어가 있어야 쿠키를 불러 올 수 있다.
+import {app, server} from './socket/socket.js'; // socket.io를 사용하기 위해 express 서버를 가져옴
 
-const app = express();
+// const app = express(); // 여기서 주석하고 socket.io를 사용하기 위해 위에서 가져옴
 const PORT = process.env.PORT || 5000;
 
 dotenv.config();
@@ -22,7 +23,7 @@ app.use("/api/users", userRoutes);
 
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   connectToMongoDB();
   console.log(`Server is running on port ${PORT}`);
 });
