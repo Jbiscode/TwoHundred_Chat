@@ -2,10 +2,13 @@ import { useRef, useEffect } from "react";
 import useGetMassages from "../../hooks/useGetMassages.js";
 import Message from "./Message";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
+import useListenMessages from '../../hooks/useListenMessages';
 
 const Messages = () => {
   const { messages, loading } = useGetMassages();
   const lastMessageRef = useRef();
+  // 메시지를 실시간으로 받아오기 위한 커스텀 훅
+  useListenMessages();
 
   useEffect(() => {
     // setTimeout이 없으면 메시지가 렌더링되기 전에 scrollIntoView가 실행되어 제대로 작동하지 않음
@@ -33,3 +36,4 @@ const Messages = () => {
   );
 };
 export default Messages;
+

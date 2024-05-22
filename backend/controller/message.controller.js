@@ -1,5 +1,6 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../socket/socket.js"; // io는 생성된 socket.io 서버를 가져옴
 
 export const sendMessage = async (req, res) => {
   console.log("sendMessage");
@@ -31,12 +32,19 @@ export const sendMessage = async (req, res) => {
       return res.status(400).json({ message: "메시지 전송 실패" });
     }
 
-    //* 소켓 IO가 올 자리
-
+    
     // await newMessage.save();
     // await conversation.save();
     await Promise.all([newMessage.save(), conversation.save()]); // Promise.all을 사용하여 두 save를 동시에 실행
 
+    //* 소켓 IO가 올 자리
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      // 그냥 emit은 전체, io.to는 특정 소켓에만 보내는 것
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
+    
     res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ message: "메시지 전송 중 오류가 발생했습니다." });
