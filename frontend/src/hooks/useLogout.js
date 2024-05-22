@@ -25,7 +25,7 @@ const useLogout = () => {
       if (response.status === 200) {
         localStorage.removeItem("chat-user");
         setAuthUser(null);
-        window.location.reload();
+        toast.success("로그아웃 성공!");
       }
     } catch (error) {
       toast.error(error.message);
