@@ -1,9 +1,19 @@
+import { useRef, useEffect } from "react";
 import useGetMassages from "../../hooks/useGetMassages.js";
 import Message from "./Message";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
 
 const Messages = () => {
   const { messages, loading } = useGetMassages();
+  const lastMessageRef = useRef();
+
+  useEffect(() => {
+    // setTimeout이 없으면 메시지가 렌더링되기 전에 scrollIntoView가 실행되어 제대로 작동하지 않음
+    setTimeout(() => {
+    lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, [messages]);
+
   console.log(messages);
   return (
     <div className="px-4 flex-1 overflow-auto">
@@ -14,7 +24,11 @@ const Messages = () => {
       )}
       {!loading &&
         messages.length > 0 &&
-        messages.map((message) => <Message key={message} message={message} />)}
+        messages.map((message) => (
+          <div key={message._id} ref={lastMessageRef}>
+            <Message message={message} />
+          </div>
+        ))}
     </div>
   );
 };

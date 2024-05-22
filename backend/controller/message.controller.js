@@ -55,7 +55,7 @@ export const getMessages = async (req, res) => {
 
 
     if (!conversation) {
-      return res.status(200).json({ message: "메시지가 없습니다." });
+      return res.status(400).json([]);
     }
     
     res.status(200).json(conversation.messages);
