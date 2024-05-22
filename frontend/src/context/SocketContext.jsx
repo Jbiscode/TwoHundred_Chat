@@ -1,8 +1,13 @@
-import {createContext, useEffect, useState} from 'react';
-import { useAuthContext } from './AuthContext';
+import {createContext, useEffect, useState, useContext} from 'react';
+import { useAuthContext } from './AuthContext.jsx';
 import io from 'socket.io-client';
 
 export const SocketContext = createContext();
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useSocketContext = () => {
+    return useContext(SocketContext);
+}
 
 export const SocketContextProvider = ({children}) => {
     const [socket, setSocket] = useState(null);

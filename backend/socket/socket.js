@@ -18,7 +18,7 @@ const userSocketMap = {}; // {userId: socketId}
 io.on("connection", (socket) => {
     console.log("a user connected", socket.id);
     const userId = socket.handshake.query.userId;
-    if(userId !== undefined){
+    if(userId != "undefined"){
         userSocketMap[userId] = socket.id;
     }
     // emit은 이벤트를 보낼때 사용한다. 연결된 모든 클라이언트에게 이벤트를 보낼수있다.
