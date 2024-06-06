@@ -9,7 +9,7 @@ const server = http.createServer(app);
 const io = new Server(server,{
   // cors 설정
     cors: {
-        origin: "http://localhost:3000",
+        origin: "http://localhost:8080",
         methods: ["GET", "POST"]
     }
 });
