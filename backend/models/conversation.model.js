@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
 
 const conversationSchema = mongoose.Schema({
+  chatRoomId: 
+    {
+      type: Number,
+      unique: true,
+      required: true,
+    },
   participants: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: Number,
+      required: true,
     }
   ],
   messages: [
@@ -14,7 +20,7 @@ const conversationSchema = mongoose.Schema({
       default: [],
     }
   ]
-}, { timestamps: true }); // 이속성으로 생성일자와 수정일자를 자동으로 생성.
+}, { timestamps: true }); // 이 속성으로 생성일자와 수정일자를 자동으로 생성.
 
 const Conversation = mongoose.model("Conversation", conversationSchema);
 
