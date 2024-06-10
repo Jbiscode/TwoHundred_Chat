@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user.model.js";
+import connectToMysqlDB from "../db/connectToMysqlDB.js";
+// import User from "../models/user.model.js";
 
 const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt; // 쿠키에서 jwt를 가져옴 (쿠키는 cookie-parser 미들웨어를 통해 req.cookies에 저장됨)
+    const token = req.headers.authorization.split("Bearer ")[1];
 
     if (!token) {
       return res.status(401).json({ message: "토큰이 없습니다." });
@@ -14,18 +15,28 @@ const protectRoute = async (req, res, next) => {
       return res.status(401).json({ message: "토큰이 유효하지않습니다." });
     }
 
-    const user = await User.findById(decoded.userId).select("-password"); // 토크에 담긴 userId로 유저를 찾아서 password를 제외한 정보를 가져옴
+    const connection = await connectToMysqlDB();
+    connection.connect((err) => {
+      if (err) {
+        return res.status(500).json({ message: "데이터베이스 연결에 실패했습니다." });
+      }
 
-    if (!user) {
-      return res.status(404).json({ message: "해당 유저가 없습니다." });
-    }
+      connection.query("SELECT * FROM user WHERE user_id = ?", [decoded.userid], (error, results) => {
+        if (error) {
+          return res.status(500).json({ message: "유저를 찾을 수 없습니다." });
+        }
 
-    // req.user에 user 정보를 넣어줌
-    // 이후 sendMessage, getMessages 등의 함수에서 req.user로 유저 정보에 접근 가능
-    req.user = user;
+        const user = results[0];
 
-    // 다음 미들웨어로 이동
-    next();
+        if (!user) {
+          return res.status(404).json({ message: "해당 유저가 없습니다." });
+        }
+
+        // console.log(user);
+        req.user = user;
+        next();
+      });
+    });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ message: "인증에 실패했습니다." });
