@@ -34,7 +34,7 @@ jobs:
         run: |
           npm install -g pm2
           touch .env
-          echo ${{ secrets.ENV_FILE }} >> .env
+          echo ${{ secrets.ENV_FILE }} | base64 -d >> .env
           cat .env
           ls -alrth
 

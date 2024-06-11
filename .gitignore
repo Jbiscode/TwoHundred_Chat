@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.base64
 frontend
 mixed_certificate.crt
 private.key
