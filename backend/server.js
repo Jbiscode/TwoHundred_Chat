@@ -13,7 +13,7 @@ import {app, server} from './socket/socket.js'; // socket.io를 사용하기 위
 // const app = express(); // 여기서 주석하고 socket.io를 사용하기 위해 위에서 가져옴
 const PORT = process.env.PORT || 5000;
 
-dotenv.config({ path: '/usr/src/app/.env' });
+dotenv.config();
 
 app.use(express.json()); // to parse the incoming requests with JSON payloads (from request.body)
 app.use(cookieParser()); // 쿠키파서 미들웨어 추가

@@ -1,12 +1,12 @@
 import { Server } from "socket.io"; // 꼭 Server를 가져와야함
 import https from "https";
-// import http from "http";
+import http from "http";
 import express from "express";
 import fs from "fs";
 import path from "path";
 import dotenv from 'dotenv';
 
-dotenv.config({path:"/usr/src/app/.env"});
+dotenv.config();
 
 const __dirname = path.resolve();
 
@@ -17,8 +17,13 @@ const sslOptions = {
     key: fs.readFileSync(path.join(__dirname, "./private.key")),
 }
 
-// const server = http.createServer(app);
-const server = https.createServer(sslOptions, app);
+let server;
+
+if(process.env.STAGE === "production"){
+    server = https.createServer(sslOptions, app);
+} else {
+    server = http.createServer(app);
+}
 
 const io = new Server(server,{
   // cors 설정
