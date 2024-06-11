@@ -8,7 +8,6 @@ RUN npm install
 RUN npm install -g pm2
 RUN pwd
 RUN ls -al
-RUN echo "223.130.130.197 n35he.vpc.mg.naverncp.com" >> /etc/hosts
 
 COPY . .
 RUN ls -al
