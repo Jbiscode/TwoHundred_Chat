@@ -12,4 +12,4 @@ COPY . .
 EXPOSE 5000
 
 # CMD [ "npm", "run","start" ]
-CMD ["pm2-runtime", "start", "ecosystem.config.js"]
+CMD ["pm2-runtime", "start", "ecosystem.config.cjs"]
