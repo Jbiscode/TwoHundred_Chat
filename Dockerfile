@@ -10,6 +10,7 @@ RUN pwd
 RUN ls -al
 
 COPY . .
+RUN ls -al
 
 EXPOSE 5000
 
