@@ -10,6 +10,7 @@ const connectToMysqlDB = async () => {
       password: process.env.MYSQL_DB_PASSWORD,
       database: process.env.MYSQL_DB_DATABASE,
     });
+    console.log("MySQL DB Connected");
     return connection;
   } catch (error) {
     console.log("Error connecting to MySQL DB", error);
