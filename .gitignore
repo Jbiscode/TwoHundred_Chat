@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .env
 frontend
+mixed_certificate.crt
+private.key
