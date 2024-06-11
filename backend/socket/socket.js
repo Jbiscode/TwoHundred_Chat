@@ -6,7 +6,7 @@ import express from "express";
 // import path from "path";
 import dotenv from 'dotenv';
 
-dotenv.config({path:"/usr/src/app/.env"});
+dotenv.config();
 
 // const __dirname = path.resolve();
 
