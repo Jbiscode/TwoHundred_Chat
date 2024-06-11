@@ -4,7 +4,12 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "server": "nodemon ./backend/server.js"
+    "server": "nodemon ./backend/server.js",
+    "start": "pm2 start backend/server.js --name real-chatapp",
+    "stop": "pm2 stop real-chatapp",
+    "restart": "pm2 restart real-chatapp",
+    "status": "pm2 status",
+    "logs": "pm2 logs real-chatapp"
   },
   "type": "module",
   "keywords": [],
