@@ -8,8 +8,11 @@ export const getUsersForSidebar = async (req, res) => {
     const mysqlConnection = await connectToMysqlDB();
     
     mysqlConnection.connect( () => {
-      const sqlQuery = `SELECT chat_room.*
-                                  , article.*
+      const sqlQuery = `SELECT chat_room.id,
+                                  chat_room.user_id,
+                                  chat_room.created_date,
+                                  chat_room.modified_date AS chat_modified_date,
+                                  article.*
                                   , writer.username AS writer_name
                                   , user.username AS user_name
                                   , product_image.thumbnail_url AS thumbnail_url
@@ -22,7 +25,8 @@ export const getUsersForSidebar = async (req, res) => {
                           ON article.writer_id = writer.user_id
                         LEFT JOIN user AS user
                           ON chat_room.user_id = user.user_id
-                        WHERE thumbnail_url IS NOT NULL AND (article.writer_id = ? OR chat_room.user_id = ?)`;
+                        WHERE thumbnail_url IS NOT NULL AND (article.writer_id = ? OR chat_room.user_id = ?)
+                        ORDER BY chat_modified_date DESC`;
       mysqlConnection.query(sqlQuery, [req.user.user_id, req.user.user_id], (err, response) => {
         if (err) {
           console.error("에러: ", err);
