@@ -1,24 +1,25 @@
 import { Server } from "socket.io"; // 꼭 Server를 가져와야함
-import https from "https";
-// import http from "http";
+// import https from "https";
+import http from "http";
 import express from "express";
-import fs from "fs";
-import path from "path";
+// import fs from "fs";
+// import path from "path";
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const __dirname = path.resolve();
+// const __dirname = path.resolve();
 
 const app = express();
 
-const sslOptions = {
-    cert: fs.readFileSync(path.join(__dirname, "./mixed_certificate.crt")),
-    key: fs.readFileSync(path.join(__dirname, "./private.key"))
-}
+// const sslOptions = {
+//     cert: fs.readFileSync(path.join(__dirname, "./mixed_certificate.crt")),
+//     key: fs.readFileSync(path.join(__dirname, "./private.key")),
+//     rejectUnauthorized: false
+// }
 
-// const server = http.createServer(app);
-const server = https.createServer(sslOptions, app);
+const server = http.createServer(app);
+// const server = https.createServer(sslOptions, app);
 
 const io = new Server(server,{
   // cors 설정
