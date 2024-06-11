@@ -26,9 +26,9 @@ const protectRoute = async (req, res, next) => {
           return res.status(500).json({ message: "유저를 찾을 수 없습니다." });
         }
 
-        const user = results[0];
+        const user = results.length > 0 ? results[0] : null;
 
-        if (!user) {
+        if (user === null) {
           return res.status(404).json({ message: "해당 유저가 없습니다." });
         }
 
@@ -38,6 +38,10 @@ const protectRoute = async (req, res, next) => {
       });
     });
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      console.log(error.message);
+      return res.status(401).json({ message: "토큰이 만료되었습니다." });
+    }
     console.log(error.message);
     return res.status(500).json({ message: "인증에 실패했습니다." });
   }
