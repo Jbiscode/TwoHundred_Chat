@@ -7,14 +7,16 @@ export const getUsersForSidebar = async (req, res) => {
     //! LMS에서는 같은 기수사람들의 정보를 가져와보자.
     const mysqlConnection = await connectToMysqlDB();
     
-    mysqlConnection.connect( () => {
+
       const sqlQuery = `SELECT chat_room.id,
                                   chat_room.user_id,
                                   chat_room.created_date,
                                   chat_room.modified_date AS chat_modified_date,
                                   article.*
                                   , writer.username AS writer_name
+                                  , writer.profile_image_url AS writer_profile_image_url
                                   , user.username AS user_name
+                                  , user.profile_image_url AS user_profile_image_url
                                   , product_image.thumbnail_url AS thumbnail_url
                         FROM chat_room 
                         LEFT JOIN article 
@@ -28,6 +30,7 @@ export const getUsersForSidebar = async (req, res) => {
                         WHERE thumbnail_url IS NOT NULL AND (article.writer_id = ? OR chat_room.user_id = ?)
                         ORDER BY chat_modified_date DESC`;
       mysqlConnection.query(sqlQuery, [req.user.user_id, req.user.user_id], (err, response) => {
+        mysqlConnection.end();
         if (err) {
           console.error("에러: ", err);
           return;
@@ -35,7 +38,7 @@ export const getUsersForSidebar = async (req, res) => {
 
         res.status(200).json(response);
       });
-    });
+
 
     // const loggedInUser = req.user._id; // protectRoute 미들웨어를 통해 req.user에 로그인한 유저 정보가 담겨있음
     

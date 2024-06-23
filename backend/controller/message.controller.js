@@ -4,7 +4,7 @@ import { getReceiverSocketId, io } from "../socket/socket.js"; // io는 생성�
 import connectToMysqlDB from "../db/connectToMysqlDB.js";
 
 export const sendMessage = async (req, res) => {
-  console.log("sendMessage");
+  // console.log("sendMessage");
   try {
     const { message } = req.body;
     const { roomId, userId } = req.params; // 보낼때 receiverId는 상대방의 아이디
@@ -65,8 +65,8 @@ export const sendMessage = async (req, res) => {
         console.error("에러: ", err);
         return res.status(500).json({ message: "메시지 업데이트 중 오류가 발생했습니다." });
       }
+      mysqlConnection.end();
     });
-
     res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ message: "메시지 전송 중 오류가 발생했습니다." });
@@ -74,7 +74,7 @@ export const sendMessage = async (req, res) => {
 };
 
 export const getMessages = async (req, res) => {
-  console.log("getMessages");
+  // console.log("getMessages");
   try {
     const { roomId, userId } = req.params; // roomId는 상대방과의 대화방의 아이디
     const getUserAndWriterIds = await fetchUserAndWriterIds(roomId);
@@ -111,7 +111,7 @@ export const getMessages = async (req, res) => {
 };
 
 export const getLastAndUnreadMessages = async (req, res) => {
-  console.log("getLastAndUnreadMessages");
+  // console.log("getLastAndUnreadMessages");
   try {
     const { roomId, userId } = req.params; // roomId는 상대방과의 대화방의 아이디
     const getUserAndWriterIds = await fetchUserAndWriterIds(roomId);
@@ -132,7 +132,7 @@ export const getLastAndUnreadMessages = async (req, res) => {
     const unreadCount = messages.filter(msg => msg.receiverId == userId && !msg.isRead).length;
     const lastMessage = messages[0].message;
     const modifiedDate = messages[0].createdAt;
-    console.log(modifiedDate);
+
     res.status(200).json({ unreadCount, lastMessage, modifiedDate });
 
   } catch (error) {
@@ -142,7 +142,7 @@ export const getLastAndUnreadMessages = async (req, res) => {
 
 
 async function fetchUserAndWriterIds(roomId) {
-  const mysqlConnection = await connectToMysqlDB();
+  const Connection = await connectToMysqlDB();
   const sqlQuery = `SELECT user_id, writer_id
                       FROM chat_room 
                       LEFT JOIN article ON chat_room.article_id = article.article_id 
@@ -150,11 +150,12 @@ async function fetchUserAndWriterIds(roomId) {
 
   const getUserAndWriterIds = () => {
     return new Promise((resolve, reject) => {
-      mysqlConnection.query(sqlQuery, [roomId], (err, response) => {
+      Connection.query(sqlQuery, [roomId], (err, response) => {
         if (err) {
           console.error("에러: ", err);
           return reject(err);
         }
+        Connection.end();
         
         const user_id = response[0]?.user_id;
         const writer_id = response[0]?.writer_id;
