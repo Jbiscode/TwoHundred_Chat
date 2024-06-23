@@ -3,15 +3,16 @@ import jwt from "jsonwebtoken";
 
 const connectToMysqlDB = () => {
   try {
-    const connection = mysql.createConnection({
+    const pool = mysql.createPool({
       host: process.env.MYSQL_DB_HOST,
       port: process.env.MYSQL_DB_PORT,
       user: process.env.MYSQL_DB_USER,
       password: process.env.MYSQL_DB_PASSWORD,
       database: process.env.MYSQL_DB_DATABASE,
+      connectionLimit: 50,
     });
 
-    return connection;
+    return pool;
   } catch (error) {
     console.log("Error connecting to MySQL DB", error);
   }
@@ -23,8 +24,14 @@ const verifyTokenAndCheckUser = async (token) => {
     console.log(decoded);
     const userId = decoded.userid;
 
-    const connection = await connectToMysqlDB();
+    const pool = connectToMysqlDB();
+    pool.getConnection((error, connection) => {
+      if (error) {
+        throw new Error("DB 연결 중 오류가 발생했습니다.");
+      }
+
     connection.query("SELECT * FROM user WHERE user_id = ?", [userId], (error, results) => {
+      connection.release();
       if (error) {
         throw new Error("쿼리 실행 중 오류가 발생했습니다.");
       }
@@ -35,8 +42,9 @@ const verifyTokenAndCheckUser = async (token) => {
         // return "권한이 확인되었습니다.";
         console.log(results);
       }
-      connection.end();
     });
+    });
+
   } catch (error) {
     return Promise.reject("토큰 검증 실패: " + error.message);
   }

@@ -15,13 +15,14 @@ const protectRoute = async (req, res, next) => {
       return res.status(401).json({ message: "토큰이 유효하지않습니다." });
     }
 
-    const connection = await connectToMysqlDB();
-    connection.connect((err) => {
-      if (err) {
-        return res.status(500).json({ message: "데이터베이스 연결에 실패했습니다." });
+    const pool = connectToMysqlDB();
+    pool.getConnection((error, connection) => {
+      if (error) {
+        return res.status(500).json({ message: "DB 연결 중 오류가 발생했습니다." });
       }
 
       connection.query("SELECT * FROM user WHERE user_id = ?", [decoded.userid], (error, results) => {
+        connection.release();
         if (error) {
           return res.status(500).json({ message: "유저를 찾을 수 없습니다." });
         }

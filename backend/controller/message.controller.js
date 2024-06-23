@@ -56,18 +56,20 @@ export const sendMessage = async (req, res) => {
       // 그냥 emit은 전체, io.to는 특정 소켓에만 보내는 것
       io.to(receiverSocketId).emit("newMessage", newMessage);
     }
-    const mysqlConnection = await connectToMysqlDB();
+    const pool = connectToMysqlDB();
     const sqlQuery = `UPDATE chat_room 
                       SET modified_date = NOW()
                       WHERE id = ?`;
+    pool.getConnection((error, mysqlConnection) => {
     mysqlConnection.query(sqlQuery, [roomId], (err, response) => {
+      mysqlConnection.release();
       if (err) {
         console.error("에러: ", err);
         return res.status(500).json({ message: "메시지 업데이트 중 오류가 발생했습니다." });
       }
-      mysqlConnection.end();
     });
     res.status(201).json(newMessage);
+    });
   } catch (error) {
     res.status(500).json({ message: "메시지 전송 중 오류가 발생했습니다." });
   }
@@ -142,7 +144,7 @@ export const getLastAndUnreadMessages = async (req, res) => {
 
 
 async function fetchUserAndWriterIds(roomId) {
-  const Connection = await connectToMysqlDB();
+  const pool = connectToMysqlDB();
   const sqlQuery = `SELECT user_id, writer_id
                       FROM chat_room 
                       LEFT JOIN article ON chat_room.article_id = article.article_id 
@@ -150,16 +152,20 @@ async function fetchUserAndWriterIds(roomId) {
 
   const getUserAndWriterIds = () => {
     return new Promise((resolve, reject) => {
+      pool.getConnection((error, Connection) => {
+        if (error) {
+          throw new Error("DB 연결 중 오류가 발생했습니다.");
+        }
       Connection.query(sqlQuery, [roomId], (err, response) => {
+        Connection.release();
         if (err) {
           console.error("에러: ", err);
           return reject(err);
         }
-        Connection.end();
-        
         const user_id = response[0]?.user_id;
         const writer_id = response[0]?.writer_id;
         resolve({ user_id, writer_id });
+      });
       });
     });
   };
