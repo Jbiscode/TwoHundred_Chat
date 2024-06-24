@@ -1,9 +1,12 @@
 import mysql from "mysql";
 import jwt from "jsonwebtoken";
 
+let pool;
+
 const connectToMysqlDB = () => {
   try {
-    const pool = mysql.createPool({
+    if (!pool) {
+    pool = mysql.createPool({
       host: process.env.MYSQL_DB_HOST,
       port: process.env.MYSQL_DB_PORT,
       user: process.env.MYSQL_DB_USER,
@@ -11,7 +14,7 @@ const connectToMysqlDB = () => {
       database: process.env.MYSQL_DB_DATABASE,
       connectionLimit: 50,
     });
-
+  }
     return pool;
   } catch (error) {
     console.log("Error connecting to MySQL DB", error);
